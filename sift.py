@@ -12,7 +12,7 @@ def save_color_img(x, file_name):
 	return
 
 # Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
-def plot_correspondences(image1, image2, correspondences, color, file_name):
+def plot_correspondences(image1, image2, correspondences, color, file_name=None):
 	image = np.concatenate((image1, image2), axis=1)
 	for correspondence in correspondences:
 		point1, point2 = correspondence
@@ -23,23 +23,23 @@ def plot_correspondences(image1, image2, correspondences, color, file_name):
 					color, 2, cv2.LINE_AA)
 		cv2.line(image, point1, tuple([point2[0] + image1.shape[1], point2[1]]), 
 					color, 2)
-
-	save_color_img(image, file_name)
+	if file_name != None:
+		save_color_img(image, file_name)
 	return
 
 # Adapted from https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
-def grey_sift(image, num_features, file_name):
+def grey_sift(image, num_features, file_name=None):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
 	sift = cv2.SIFT_create(num_features)
 	key_points = sift.detect(grey,None)
 	img = cv2.drawKeypoints(grey, key_points, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-	cv2.imwrite(f'{file_name}.jpg',img)
+	if file_name != None:
+		cv2.imwrite(f'{file_name}.jpg',img)
 
 def run_sift(image, num_features):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
 	sift = cv2.SIFT_create(num_features)
 	key_points = sift.detect(grey,None)
-	#     save_color_img(cv2.drawKeypoints(grey,key_points,image)) #for debugging
 	key_points,descriptors = sift.compute(grey,key_points)
 	return key_points, descriptors
 
