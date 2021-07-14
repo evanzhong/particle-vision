@@ -8,4 +8,4 @@ def find_contours(image, file_name=None):
 	contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	image_with_contours = cv2.drawContours(image, contours, -1, (0,255,0), 3)
 	if file_name != None:
-		cv2.imwrite(f'{file_name}.jpg', image_with_contours)
+		cv2.imwrite(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.jpg', image_with_contours)

@@ -34,7 +34,7 @@ def grey_sift(image, num_features, file_name=None):
 	key_points = sift.detect(grey,None)
 	img = cv2.drawKeypoints(grey, key_points, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 	if file_name != None:
-		cv2.imwrite(f'{file_name}.jpg',img)
+		cv2.imwrite(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.jpg',img)
 
 def run_sift(image, num_features):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
