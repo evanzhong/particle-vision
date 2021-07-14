@@ -3,7 +3,6 @@ import const
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-from numpy.core.shape_base import block
 
 # Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
 def save_color_img(x, file_name):
