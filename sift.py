@@ -28,6 +28,14 @@ def plot_correspondences(image1, image2, correspondences, color, file_name):
 	save_color_img(image, file_name)
 	return
 
+# Adapted from https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
+def grey_sift(image, num_features, file_name):
+	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
+	sift = cv2.SIFT_create(num_features)
+	key_points = sift.detect(grey,None)
+	img = cv2.drawKeypoints(grey, key_points, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+	cv2.imwrite(f'{file_name}.jpg',img)
+
 def run_sift(image, num_features):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
 	sift = cv2.SIFT_create(num_features)
