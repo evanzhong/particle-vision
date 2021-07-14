@@ -133,3 +133,6 @@ dmypy.json
 
 # data output directory
 out
+
+# Testing script
+test_script.py
