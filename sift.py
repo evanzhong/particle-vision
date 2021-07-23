@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def save_color_img(x, file_name):
 	plt.figure(figsize=(20,20))
 	plt.imshow(x/x.max(),vmin=0,vmax=1)
-	plt.savefig(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.pdf', format='pdf', bbox_inches='tight')
+	plt.savefig(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.png', format='png', bbox_inches='tight')
 	return
 
 # Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
