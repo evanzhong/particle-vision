@@ -1,6 +1,7 @@
 import const
 
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Simple thresholding to convert RGB image into binary image
@@ -28,5 +29,30 @@ def find_contours(image, file_name=None):
 		image_with_contours = cv2.drawContours(image, contours, -1, (0,255,0), 3)
 		cv2.imwrite(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.jpg', image_with_contours)
 	return contours
+
+def get_bounding_boxes(contours, padding=1):
+	bounding_boxes = []
+	for contour in contours:
+		x_coords = []
+		y_coords = []
+		for point in contour:
+			x_coord = point[0][0]
+			y_coord = point[0][1]
+			x_coords.append(x_coord)
+			y_coords.append(y_coord)
+		min_x = min(x_coords) - padding
+		max_x = max(x_coords) + padding
+		min_y = min(y_coords) - padding
+		max_y = max(y_coords) + padding
+		bounding_boxes.append([min_x, max_x, min_y, max_y]) #consider making this an object?
+
+	return bounding_boxes
+
+def draw_boudning_boxes(image, boudning_boxes, border_width=1):
+	image_copy = np.copy(image)
+	for boudning_box in boudning_boxes:
+		min_x, max_x, min_y, max_y = boudning_box
+		image_copy = cv2.rectangle(image_copy, (min_x, min_y), (max_x, max_y), (255, 0, 0), border_width)
+	return image_copy
 
 print('segmentation.py module loaded')
