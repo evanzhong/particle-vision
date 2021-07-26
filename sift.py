@@ -5,6 +5,7 @@ import cv2
 
 # Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
 def plot_correspondences(image1, image2, correspondences, color, file_name=None):
+	if(file_name == None): return False
 	image = np.concatenate((image1, image2), axis=1)
 	for correspondence in correspondences:
 		point1, point2 = correspondence
@@ -15,18 +16,19 @@ def plot_correspondences(image1, image2, correspondences, color, file_name=None)
 					color, 2, cv2.LINE_AA)
 		cv2.line(image, point1, tuple([point2[0] + image1.shape[1], point2[1]]), 
 					color, 2)
-	if file_name != None:
-		util.write_image(image, file_name)
-	return
+	util.write_image(image, file_name)
+	return True
 
 # Adapted from https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
-def plot_sift_descriptors(image, num_features, file_name):
+def plot_sift_descriptors(image, num_features, file_name=None):
+	if(file_name == None): return False
 	key_points, descriptors = run_sift(image, num_features)
 	image_with_keypoints = cv2.drawKeypoints(cv2.cvtColor(image,cv2.COLOR_RGB2GRAY),
 																					 key_points,
 																					 np.copy(image),
 																					 flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 	util.write_image(image_with_keypoints, file_name)
+	return True
 
 def run_sift(image, num_features):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
