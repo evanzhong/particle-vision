@@ -6,7 +6,7 @@ import numpy as np
 # Simple thresholding to convert RGB image into binary image
 def threshold_image(image, file_name = None):
 	grey_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-	ret, thresholded_image = cv2.threshold(grey_image, 127, 255, 0)
+	ret, thresholded_image = cv2.threshold(grey_image, 127, 255, cv2.THRESH_BINARY)
 	if file_name != None:
 		util.write_image(thresholded_image, file_name)
 	return thresholded_image
