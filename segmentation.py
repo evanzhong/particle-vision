@@ -26,7 +26,8 @@ def find_contours(image):
 
 def draw_contours(image, contours, color, file_name = None):
 	if file_name == None: return False
-	image_with_contours = cv2.drawContours(image, contours, -1, color, 3)
+	image_with_contours = np.copy(image)
+	image_with_contours = cv2.drawContours(image_with_contours, contours, -1, color, 2)
 	util.write_image(image_with_contours, file_name)
 	return True
 
@@ -46,13 +47,15 @@ def find_bounding_boxes(contours, padding=1):
 		max_y = max(y_coords) + padding
 		bounding_boxes.append([min_x, max_x, min_y, max_y]) #consider making this an object?
 
-	return bounding_boxes
+	return np.asarray(bounding_boxes)
 
-def draw_boudning_boxes(image, boudning_boxes, border_width=1):
-	image_copy = np.copy(image)
-	for boudning_box in boudning_boxes:
-		min_x, max_x, min_y, max_y = boudning_box
-		image_copy = cv2.rectangle(image_copy, (min_x, min_y), (max_x, max_y), (255, 0, 0), border_width)
-	return image_copy
+def draw_bounding_boxes(image, bounding_boxes, border_color, border_width=1, file_name = None):
+	if file_name == None: return False
+	image_with_boxes = np.copy(image)
+	for bounding_box in bounding_boxes:
+		min_x, max_x, min_y, max_y = bounding_box
+		image_with_boxes = cv2.rectangle(image_with_boxes, (min_x, min_y), (max_x, max_y), border_color, border_width)
+	util.write_image(image_with_boxes, file_name)
+	return True
 
 print('segmentation.py module loaded')
