@@ -51,4 +51,12 @@ def draw_bounding_boxes(image, bounding_boxes, border_color, border_width=1, fil
 	util.write_image(image_with_boxes, file_name)
 	return True
 
+def group_bounding_boxes(bounding_boxes, ratio, should_duplicate=False):
+	if should_duplicate:
+		boxes_to_use = bounding_boxes + bounding_boxes #see https://answers.opencv.org/question/204530/merge-overlapping-rectangles/
+	else:
+		boxes_to_use = bounding_boxes
+	grouped_boxes, weights = cv2.groupRectangles(boxes_to_use, 1, ratio)
+	return grouped_boxes
+
 print('segmentation.py module loaded')
