@@ -1,18 +1,11 @@
-import const
+import util
 
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
-
-# Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
-def save_color_img(x, file_name):
-	plt.figure(figsize=(20,20))
-	plt.imshow(x/x.max(),vmin=0,vmax=1)
-	plt.savefig(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.png', format='png', bbox_inches='tight')
-	return
 
 # Adapted from Prof Achuta Kadami, Prof Stefano Soatto (CS 188: Introduction to Computer Vision)
 def plot_correspondences(image1, image2, correspondences, color, file_name=None):
+	if(file_name == None): return False
 	image = np.concatenate((image1, image2), axis=1)
 	for correspondence in correspondences:
 		point1, point2 = correspondence
@@ -23,18 +16,19 @@ def plot_correspondences(image1, image2, correspondences, color, file_name=None)
 					color, 2, cv2.LINE_AA)
 		cv2.line(image, point1, tuple([point2[0] + image1.shape[1], point2[1]]), 
 					color, 2)
-	if file_name != None:
-		save_color_img(image, file_name)
-	return
+	util.write_image(image, file_name)
+	return True
 
 # Adapted from https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
-def grey_sift(image, num_features, file_name=None):
-	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
-	sift = cv2.SIFT_create(num_features)
-	key_points = sift.detect(grey,None)
-	img = cv2.drawKeypoints(grey, key_points, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-	if file_name != None:
-		cv2.imwrite(f'{const.DATA_OUTPUT_DIRECTORY}/{file_name}.jpg',img)
+def plot_sift_descriptors(image, num_features, file_name=None):
+	if(file_name == None): return False
+	key_points, descriptors = run_sift(image, num_features)
+	image_with_keypoints = cv2.drawKeypoints(cv2.cvtColor(image,cv2.COLOR_RGB2GRAY),
+																					 key_points,
+																					 np.copy(image),
+																					 flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+	util.write_image(image_with_keypoints, file_name)
+	return True
 
 def run_sift(image, num_features):
 	grey = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
