@@ -34,27 +34,20 @@ def draw_contours(image, contours, color, file_name = None):
 def find_bounding_boxes(contours, padding=1):
 	bounding_boxes = []
 	for contour in contours:
-		x_coords = []
-		y_coords = []
-		for point in contour:
-			x_coord = point[0][0]
-			y_coord = point[0][1]
-			x_coords.append(x_coord)
-			y_coords.append(y_coord)
-		min_x = min(x_coords) - padding
-		max_x = max(x_coords) + padding
-		min_y = min(y_coords) - padding
-		max_y = max(y_coords) + padding
-		bounding_boxes.append([min_x, max_x, min_y, max_y]) #consider making this an object?
-
+		x, y, width, height = cv2.boundingRect(contour)
+		if (x - padding) >= 0: x -= padding
+		if (y - padding) >= 0: y -= padding
+		width += padding #should this also be gated?
+		height += padding
+		bounding_boxes.append([x, y, width, height])
 	return np.asarray(bounding_boxes)
 
 def draw_bounding_boxes(image, bounding_boxes, border_color, border_width=1, file_name = None):
 	if file_name == None: return False
 	image_with_boxes = np.copy(image)
 	for bounding_box in bounding_boxes:
-		min_x, max_x, min_y, max_y = bounding_box
-		image_with_boxes = cv2.rectangle(image_with_boxes, (min_x, min_y), (max_x, max_y), border_color, border_width)
+		x, y, width, height = bounding_box
+		image_with_boxes = cv2.rectangle(image_with_boxes, (x, y), (x + width, y + height), border_color, border_width)
 	util.write_image(image_with_boxes, file_name)
 	return True
 
