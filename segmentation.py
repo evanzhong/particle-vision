@@ -25,11 +25,11 @@ def find_contours(image):
 	return contours
 
 def draw_contours(image, contours, color, file_name = None):
-	if file_name == None: return False
+	if file_name == None: return None
 	image_with_contours = np.copy(image)
 	image_with_contours = cv2.drawContours(image_with_contours, contours, -1, color, 2)
 	util.write_image(image_with_contours, file_name)
-	return True
+	return image_with_contours
 
 def find_bounding_boxes(contours, padding=1):
 	bounding_boxes = []
@@ -43,13 +43,13 @@ def find_bounding_boxes(contours, padding=1):
 	return np.asarray(bounding_boxes)
 
 def draw_bounding_boxes(image, bounding_boxes, border_color, border_width=1, file_name = None):
-	if file_name == None: return False
+	if file_name == None: return None
 	image_with_boxes = np.copy(image)
 	for bounding_box in bounding_boxes:
 		x, y, width, height = bounding_box
 		image_with_boxes = cv2.rectangle(image_with_boxes, (x, y), (x + width, y + height), border_color, border_width)
 	util.write_image(image_with_boxes, file_name)
-	return True
+	return image_with_boxes
 
 def group_bounding_boxes(bounding_boxes, ratio, should_duplicate=False):
 	if should_duplicate:
