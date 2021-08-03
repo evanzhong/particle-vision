@@ -41,8 +41,8 @@ def find_bounding_boxes(contours, padding=1):
 		if (y - padding) >= 0: y -= padding
 		width += padding #should this also be gated?
 		height += padding
-		bounding_boxes.append([x, y, width, height])
-	return np.asarray(bounding_boxes)
+		bounding_boxes.append((x, y, width, height))
+	return bounding_boxes
 
 def draw_bounding_boxes(image, bounding_boxes, border_color, border_width=1):
 	image_with_boxes = np.copy(image)
@@ -69,7 +69,7 @@ def has_intersection(box_1,box_2):
 	width = min(box_1[0]+box_1[2], box_2[0]+box_2[2]) - x
 	height = min(box_1[1]+box_1[3], box_2[1]+box_2[3]) - y
 	if width < 0 or height < 0: return False
-	else: return box_area([x, y, width, height]) > 0
+	else: return box_area((x, y, width, height)) > 0
 
 # Adapted from https://stackoverflow.com/questions/46260892/finding-the-union-of-multiple-overlapping-rectangles-opencv-python/57546435
 def union(box_1,box_2):
@@ -77,17 +77,13 @@ def union(box_1,box_2):
   y = min(box_1[1], box_2[1])
   width = max(box_1[0]+box_1[2], box_2[0]+box_2[2]) - x
   height = max(box_1[1]+box_1[3], box_2[1]+box_2[3]) - y
-  return [x, y, width, height]
+  return (x, y, width, height)
 
 def remove_null_boxes(boxes):
-	mask = []
-	for i in range(len(boxes)):
-		if box_area(boxes[i]) == 0: mask.append(True)
-		else: mask.append(False)
-	return np.delete(boxes, mask, 0)
+	return [box for box in boxes if box_area(box) != 0]
 
 def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
-	bounding_boxes_copy = np.copy(bounding_boxes)
+	bounding_boxes_copy = list.copy(bounding_boxes)
 
 	has_intersections = True
 	repeat_counter = 0
@@ -101,9 +97,9 @@ def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 				if (i == j or box_area(box_j) == 0): continue
 				if has_intersection(box_i, box_j):
 					has_intersections = True
-					bounding_boxes_copy = np.append(bounding_boxes_copy, [union(box_i, box_j)], 0)
-					bounding_boxes_copy[i] = [0, 0, 0, 0]
-					bounding_boxes_copy[j] = [0, 0, 0, 0]
+					bounding_boxes_copy.append(union(box_i, box_j))
+					bounding_boxes_copy[i] = (0, 0, 0, 0)
+					bounding_boxes_copy[j] = (0, 0, 0, 0)
 					if debug_image is not None:
 						print(f'[DEBUG] Merging box_i: {box_i}, with  box_j: {box_j} to get {union(box_i, box_j)} (check img \'repeat_counter({repeat_counter}) i({i}) j({j})\')')
 						util.write_image(
