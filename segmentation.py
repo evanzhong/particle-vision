@@ -98,7 +98,10 @@ def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 					bounding_boxes_copy[j] = [0, 0, 0, 0]
 					if debug_image is not None:
 						print(f'[DEBUG] Merging box_i: {box_i}, with  box_j: {box_j} to get {union(box_i, box_j)} (check img \'repeat_counter({repeat_counter}) i({i}) j({j})\')')
-						draw_bounding_boxes(debug_image, remove_null_boxes(bounding_boxes_copy), (0,0,255), 1, f'repeat_counter({repeat_counter}) i({i}) j({j})')
+						util.write_image(
+							image=draw_bounding_boxes(debug_image, remove_null_boxes(bounding_boxes_copy), (0,0,255), 1),
+							file_output_name=f'repeat_counter({repeat_counter}) i({i}) j({j})'
+						)
 					break
 		repeat_counter += 1
 
