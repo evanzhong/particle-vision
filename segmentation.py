@@ -9,6 +9,14 @@ def threshold_image(image):
 	ret, thresholded_image = cv2.threshold(grey_image, 127, 255, cv2.THRESH_BINARY)
 	return thresholded_image
 
+def otsu_threshold_image(image, should_apply_gaussian = False):
+	image_to_use = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+	if should_apply_gaussian:
+		image_to_use = cv2.GaussianBlur(image_to_use, (3,3), 0)
+
+	ret, thresholded_image = cv2.threshold(image_to_use, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+	return thresholded_image
+
 # Use the Canny edge detector in open-cv to convert RGB image into binary image
 def canny_edge_image(image):
 	edges = cv2.Canny(image,100,200)
