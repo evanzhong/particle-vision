@@ -96,21 +96,66 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
 
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
-if __name__ == "__main__":
-  m3_img0  = util.read_image(const.MINION_3_FRAMES[0])
-  m3_img1  = util.read_image(const.MINION_3_FRAMES[1])
+def readable_correspondence(correspondence):
+  point_0 = correspondence[0]
+  point_1 = correspondence[1]
+  return ((round(point_0[0]), round(point_0[1])), (round(point_1[0]), round(point_1[1])))
 
-  corrs, boxes_0, boxes_1 = compare_two_images(
-    m3_img0,
-    m3_img1,
+def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False):
+  GLOBAL_MAP = {}
+  GLOBAL_LIST = []
+  for frame_n in range(len(frames)-1):
+    imgN  = util.read_image(frames[frame_n])
+    imgN_1  = util.read_image(frames[frame_n+1])
+
+    corrs, boxes_N, boxes_N_1 = compare_two_images(
+      imgN,
+      imgN_1,
+      num_sift_features=num_sift_features,
+      sift_correspondence_ratio=sift_correspondence_ratio,
+      should_save_images=should_save_images
+    )
+
+    # Initialize the GLOBAL objects with frame_0 information
+    if frame_n == 0:
+      for box_0 in boxes_N:
+        list_index = len(GLOBAL_LIST)
+        GLOBAL_MAP[box_0] = list_index
+
+        ROI_area = seg.get_non_zero_pixel_area(
+          image=seg.crop_image(image=imgN, box=box_0)
+        )
+        GLOBAL_LIST.append([])
+        GLOBAL_LIST[list_index].append((ROI_area, (0, box_0)))
+
+    print(f'\nGLOBAL_MAP: {GLOBAL_MAP}')
+    curr_map = {} #object to collect current maaping
+    for corr, box_N, box_N_1 in zip(corrs, boxes_N, boxes_N_1):
+      imgN_ROI = seg.crop_image(imgN, box_N)
+      imgN_1_ROI = seg.crop_image(imgN_1, box_N_1)
+      imgN_ROI_area = seg.get_non_zero_pixel_area(imgN_ROI)
+      imgN_1_ROI_area = seg.get_non_zero_pixel_area(imgN_1_ROI)
+      print(f'({imgN_ROI_area},{imgN_1_ROI_area}) img{frame_n}_{box_N} to img{frame_n+1}_{box_N_1} via {readable_correspondence(corr)}')
+      if should_save_images: util.write_image(imgN_ROI, f'img{frame_n}_{box_N}')
+
+      list_index = -1
+      if box_N in GLOBAL_MAP:
+        list_index = GLOBAL_MAP[box_N]
+      else:
+        list_index = len(GLOBAL_LIST)
+        GLOBAL_LIST.append([])
+
+      GLOBAL_LIST[list_index].append((imgN_1_ROI_area, (frame_n+1, box_N_1)))
+      curr_map[box_N_1] = list_index
+    GLOBAL_MAP = curr_map
+
+  print(GLOBAL_LIST)
+  return GLOBAL_LIST
+
+if __name__ == "__main__":
+  analyze_frames(
+    frames=const.MINION_3_FRAMES,
     num_sift_features=3000,
     sift_correspondence_ratio=0.6,
     should_save_images=False
   )
-
-  for corr, box_0, box_1 in zip(corrs, boxes_0, boxes_1):
-    m3_img0_ROI = seg.crop_image(m3_img0, box_0)
-    m3_img1_ROI = seg.crop_image(m3_img1, box_1)
-    print(f'({seg.get_non_zero_pixel_area(m3_img0_ROI)},{seg.get_non_zero_pixel_area(m3_img1_ROI)}) m3_img0_{box_0} to m3_img1_{box_1} via {corr}')
-    # util.write_image(m3_img0_ROI, f'm3_img0_{box_0}')
-    # util.write_image(m3_img1_ROI, f'm3_img1_{box_1}')
