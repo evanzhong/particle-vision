@@ -119,4 +119,8 @@ def crop_image(image, box):
   cropped_image = image[y:y+height, x:x+width]
   return cropped_image
 
+def get_non_zero_pixel_area(image):
+	binary_image = otsu_threshold_image(image)
+	return cv2.countNonZero(binary_image)
+
 print('segmentation.py module loaded')
