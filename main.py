@@ -31,8 +31,11 @@ def filter_correspondences_and_boxes(correspondences, boxes_0, boxes_1):
     
     box_0_containing_point = get_box_containing_point(point_0, boxes_0)
     box_1_containing_point = get_box_containing_point(point_1, boxes_1)
-    if (box_0_containing_point is not None and 
-        box_1_containing_point is not None):
+    if (box_0_containing_point is not None and
+        box_1_containing_point is not None and
+        box_0_containing_point not in filtered_boxes_0 and
+        box_1_containing_point not in filtered_boxes_1
+        ):
         filtered_correspondences.append(correspondence)
         filtered_boxes_0.append(box_0_containing_point)
         filtered_boxes_1.append(box_1_containing_point)
@@ -96,4 +99,18 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
 if __name__ == "__main__":
   m3_img0  = util.read_image(const.MINION_3_FRAMES[0])
   m3_img1  = util.read_image(const.MINION_3_FRAMES[1])
-  compare_two_images(m3_img0, m3_img1, num_sift_features=3000, sift_correspondence_ratio=0.6, should_save_images=True)
+
+  corrs, boxes_0, boxes_1 = compare_two_images(
+    m3_img0,
+    m3_img1,
+    num_sift_features=3000,
+    sift_correspondence_ratio=0.6,
+    should_save_images=False
+  )
+
+  for corr, box_0, box_1 in zip(corrs, boxes_0, boxes_1):
+    m3_img0_ROI = seg.crop_image(m3_img0, box_0)
+    m3_img1_ROI = seg.crop_image(m3_img1, box_1)
+    print(f'({seg.get_non_zero_pixel_area(m3_img0_ROI)},{seg.get_non_zero_pixel_area(m3_img1_ROI)}) m3_img0_{box_0} to m3_img1_{box_1} via {corr}')
+    # util.write_image(m3_img0_ROI, f'm3_img0_{box_0}')
+    # util.write_image(m3_img1_ROI, f'm3_img1_{box_1}')
