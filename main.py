@@ -74,12 +74,12 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
                               image2=img1_drawn_boxes,
                               correspondences=img0_img1_correspondences,
                               color=const.COLOR_RED,
-                              file_name='m3_img0_img1_corr_and_boxes')
+                              file_name='img0_img1_corr_and_boxes')
     sift.plot_correspondences(image1=img0_drawn_boxes,
                               image2=img1_drawn_boxes,
                               correspondences=filtered_correspondences,
                               color=const.COLOR_RED,
-                              file_name='m3_img0_img1_corr_filtered_and_boxes')
+                              file_name='img0_img1_corr_filtered_and_boxes')
 
     img0_drawn_filtered_boxes = seg.draw_bounding_boxes(img_0, bounding_boxes=filtered_boxes_0, border_color=const.COLOR_GREEN)
     img1_drawn_filtered_boxes = seg.draw_bounding_boxes(img_1, bounding_boxes=filtered_boxes_1, border_color=const.COLOR_GREEN)
@@ -87,12 +87,12 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
                               image2=img1_drawn_filtered_boxes,
                               correspondences=img0_img1_correspondences,
                               color=const.COLOR_RED,
-                              file_name='m3_img0_img1_corr_and_boxes_filtered')
+                              file_name='img0_img1_corr_and_boxes_filtered')
     sift.plot_correspondences(image1=img0_drawn_filtered_boxes,
                               image2=img1_drawn_filtered_boxes,
                               correspondences=filtered_correspondences,
                               color=const.COLOR_RED,
-                              file_name='m3_img0_img1_corr_filtered_and_boxes_filtered')
+                              file_name='img0_img1_corr_filtered_and_boxes_filtered')
 
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
