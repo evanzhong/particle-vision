@@ -152,6 +152,28 @@ def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_
   print(GLOBAL_LIST)
   return GLOBAL_LIST
 
+def bulk_carbon(frames):
+  frame_to_carbon_map = {}
+  for frame in frames:
+    frame_image = util.read_image(frame)
+    contours = seg.find_contours(image=frame_image)
+    boxes = seg.merge_overlapping_bounding_boxes(
+      bounding_boxes=seg.find_bounding_boxes(contours=contours, padding=0)
+    )
+
+    total_pixel_area_for_frame = 0
+    num_particles = len(boxes)
+    for box in boxes:
+      pixel_area = seg.get_non_zero_pixel_area(
+        image=seg.crop_image(image=frame_image, box=box)
+      )
+      total_pixel_area_for_frame += pixel_area
+    print(f'Frame: {frame} has total particle pixel area: {total_pixel_area_for_frame} and total # of particles: {num_particles}')
+    frame_to_carbon_map[frame] = (total_pixel_area_for_frame, num_particles)
+
+  print(frame_to_carbon_map)
+  return frame_to_carbon_map
+
 if __name__ == "__main__":
   analyze_frames(
     frames=const.MINION_3_FRAMES,
@@ -159,3 +181,5 @@ if __name__ == "__main__":
     sift_correspondence_ratio=0.6,
     should_save_images=False
   )
+
+  bulk_carbon(frames=const.MINION_3_FRAMES)
