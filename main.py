@@ -4,13 +4,9 @@ import sift
 import segmentation as seg
 
 def get_box_containing_point(point, boxes):
-	point_x = point[0]
-	point_y = point[1]
+	point_x, point_y = point
 	for box in boxes:
-		box_x = box[0]
-		box_y = box[1]
-		box_width = box[2]
-		box_height = box[3]
+		box_x, box_y, box_width, box_height = box
 		point_is_in_box = (
 			point_x >= box_x and
 			point_x <= box_x + box_width and
@@ -26,8 +22,7 @@ def filter_correspondences_and_boxes(correspondences, boxes_0, boxes_1):
   filtered_boxes_0 = []
   filtered_boxes_1 = []
   for correspondence in correspondences:
-    point_0 = correspondence[0]
-    point_1 = correspondence[1]
+    point_0, point_1 = correspondence
     
     box_0_containing_point = get_box_containing_point(point_0, boxes_0)
     box_1_containing_point = get_box_containing_point(point_1, boxes_1)
@@ -97,8 +92,7 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
 def readable_correspondence(correspondence):
-  point_0 = correspondence[0]
-  point_1 = correspondence[1]
+  point_0, point_1 = correspondence
   return ((round(point_0[0]), round(point_0[1])), (round(point_1[0]), round(point_1[1])))
 
 def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False):

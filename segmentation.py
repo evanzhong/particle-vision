@@ -112,10 +112,7 @@ def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 	return remove_null_boxes(bounding_boxes_copy)
 
 def crop_image(image, box):
-  x = box[0]
-  y = box[1]
-  width = box[2]
-  height = box[3]
+  x, y, width, height = box
   cropped_image = image[y:y+height, x:x+width]
   return cropped_image
 
