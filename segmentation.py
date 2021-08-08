@@ -59,26 +59,6 @@ def group_bounding_boxes(bounding_boxes, ratio, should_duplicate=False):
 	grouped_boxes, weights = cv2.groupRectangles(boxes_to_use, 1, ratio)
 	return grouped_boxes
 
-# Adapted from https://stackoverflow.com/questions/46260892/finding-the-union-of-multiple-overlapping-rectangles-opencv-python/57546435
-def has_intersection(box_1,box_2):
-	x = max(box_1[0], box_2[0])
-	y = max(box_1[1], box_2[1])
-	width = min(box_1[0]+box_1[2], box_2[0]+box_2[2]) - x
-	height = min(box_1[1]+box_1[3], box_2[1]+box_2[3]) - y
-	if width < 0 or height < 0: return False
-	else: return util.get_box_area((x, y, width, height)) > 0
-
-# Adapted from https://stackoverflow.com/questions/46260892/finding-the-union-of-multiple-overlapping-rectangles-opencv-python/57546435
-def union(box_1,box_2):
-  x = min(box_1[0], box_2[0])
-  y = min(box_1[1], box_2[1])
-  width = max(box_1[0]+box_1[2], box_2[0]+box_2[2]) - x
-  height = max(box_1[1]+box_1[3], box_2[1]+box_2[3]) - y
-  return (x, y, width, height)
-
-def remove_null_boxes(boxes):
-	return [box for box in boxes if util.get_box_area(box) != 0]
-
 def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 	bounding_boxes_copy = list.copy(bounding_boxes)
 
@@ -92,21 +72,21 @@ def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 			for j in range(len(bounding_boxes_copy)):
 				box_j = bounding_boxes_copy[j]
 				if (i == j or util.get_box_area(box_j) == 0): continue
-				if has_intersection(box_i, box_j):
+				if util.has_intersection(box_i, box_j):
 					has_intersections = True
-					bounding_boxes_copy.append(union(box_i, box_j))
+					bounding_boxes_copy.append(util.union(box_i, box_j))
 					bounding_boxes_copy[i] = (0, 0, 0, 0)
 					bounding_boxes_copy[j] = (0, 0, 0, 0)
 					if debug_image is not None:
-						print(f'[DEBUG] Merging box_i: {box_i}, with  box_j: {box_j} to get {union(box_i, box_j)} (check img \'repeat_counter({repeat_counter}) i({i}) j({j})\')')
+						print(f'[DEBUG] Merging box_i: {box_i}, with  box_j: {box_j} to get {util.union(box_i, box_j)} (check img \'repeat_counter({repeat_counter}) i({i}) j({j})\')')
 						util.write_image(
-							image=draw_bounding_boxes(debug_image, remove_null_boxes(bounding_boxes_copy), (0,0,255), 1),
+							image=draw_bounding_boxes(debug_image, util.remove_null_boxes(bounding_boxes_copy), (0,0,255), 1),
 							file_output_name=f'repeat_counter({repeat_counter}) i({i}) j({j})'
 						)
 					break
 		repeat_counter += 1
 
-	return remove_null_boxes(bounding_boxes_copy)
+	return util.remove_null_boxes(bounding_boxes_copy)
 
 def crop_image(image, box):
   x, y, width, height = box
