@@ -3,24 +3,6 @@ import const
 import sift
 import segmentation as seg
 
-def get_box_containing_point(point, boxes):
-	point_x = point[0]
-	point_y = point[1]
-	for box in boxes:
-		box_x = box[0]
-		box_y = box[1]
-		box_width = box[2]
-		box_height = box[3]
-		point_is_in_box = (
-			point_x >= box_x and
-			point_x <= box_x + box_width and
-			point_y >= box_y and
-			point_y <= box_y + box_height
-		)
-		if point_is_in_box:
-			return box
-	return None
-
 def filter_correspondences_and_boxes(correspondences, boxes_0, boxes_1):
   filtered_correspondences = []
   filtered_boxes_0 = []
@@ -29,8 +11,8 @@ def filter_correspondences_and_boxes(correspondences, boxes_0, boxes_1):
     point_0 = correspondence[0]
     point_1 = correspondence[1]
     
-    box_0_containing_point = get_box_containing_point(point_0, boxes_0)
-    box_1_containing_point = get_box_containing_point(point_1, boxes_1)
+    box_0_containing_point = util.get_box_containing_point(point_0, boxes_0)
+    box_1_containing_point = util.get_box_containing_point(point_1, boxes_1)
     if (box_0_containing_point is not None and
         box_1_containing_point is not None and
         box_0_containing_point not in filtered_boxes_0 and
