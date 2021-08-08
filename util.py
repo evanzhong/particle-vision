@@ -16,6 +16,10 @@ def get_readable_correspondence(correspondence):
   point_0, point_1 = correspondence
   return ((round(point_0[0]), round(point_0[1])), (round(point_1[0]), round(point_1[1])))
 
+def get_box_area(box):
+	x, y, width, height = box
+	return width * height
+
 def get_box_containing_point(point, boxes):
 	point_x, point_y = point
 	for box in boxes:

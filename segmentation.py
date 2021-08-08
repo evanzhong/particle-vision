@@ -59,9 +59,6 @@ def group_bounding_boxes(bounding_boxes, ratio, should_duplicate=False):
 	grouped_boxes, weights = cv2.groupRectangles(boxes_to_use, 1, ratio)
 	return grouped_boxes
 
-def box_area(box):
-	return box[2] * box[3]
-
 # Adapted from https://stackoverflow.com/questions/46260892/finding-the-union-of-multiple-overlapping-rectangles-opencv-python/57546435
 def has_intersection(box_1,box_2):
 	x = max(box_1[0], box_2[0])
@@ -69,7 +66,7 @@ def has_intersection(box_1,box_2):
 	width = min(box_1[0]+box_1[2], box_2[0]+box_2[2]) - x
 	height = min(box_1[1]+box_1[3], box_2[1]+box_2[3]) - y
 	if width < 0 or height < 0: return False
-	else: return box_area((x, y, width, height)) > 0
+	else: return util.get_box_area((x, y, width, height)) > 0
 
 # Adapted from https://stackoverflow.com/questions/46260892/finding-the-union-of-multiple-overlapping-rectangles-opencv-python/57546435
 def union(box_1,box_2):
@@ -80,7 +77,7 @@ def union(box_1,box_2):
   return (x, y, width, height)
 
 def remove_null_boxes(boxes):
-	return [box for box in boxes if box_area(box) != 0]
+	return [box for box in boxes if util.get_box_area(box) != 0]
 
 def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 	bounding_boxes_copy = list.copy(bounding_boxes)
@@ -91,10 +88,10 @@ def merge_overlapping_bounding_boxes(bounding_boxes, debug_image = None):
 		has_intersections = False
 		for i in range(len(bounding_boxes_copy)):
 			box_i = bounding_boxes_copy[i]
-			if(box_area(box_i) == 0): continue
+			if(util.get_box_area(box_i) == 0): continue
 			for j in range(len(bounding_boxes_copy)):
 				box_j = bounding_boxes_copy[j]
-				if (i == j or box_area(box_j) == 0): continue
+				if (i == j or util.get_box_area(box_j) == 0): continue
 				if has_intersection(box_i, box_j):
 					has_intersections = True
 					bounding_boxes_copy.append(union(box_i, box_j))
