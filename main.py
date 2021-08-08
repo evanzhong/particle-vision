@@ -96,11 +96,6 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
 
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
-def readable_correspondence(correspondence):
-  point_0 = correspondence[0]
-  point_1 = correspondence[1]
-  return ((round(point_0[0]), round(point_0[1])), (round(point_1[0]), round(point_1[1])))
-
 def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False):
   GLOBAL_MAP = {}
   GLOBAL_LIST = []
@@ -135,7 +130,7 @@ def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_
       imgN_1_ROI = seg.crop_image(imgN_1, box_N_1)
       imgN_ROI_area = seg.get_non_zero_pixel_area(imgN_ROI)
       imgN_1_ROI_area = seg.get_non_zero_pixel_area(imgN_1_ROI)
-      print(f'({imgN_ROI_area},{imgN_1_ROI_area}) img{frame_n}_{box_N} to img{frame_n+1}_{box_N_1} via {readable_correspondence(corr)}')
+      print(f'({imgN_ROI_area},{imgN_1_ROI_area}) img{frame_n}_{box_N} to img{frame_n+1}_{box_N_1} via {util.get_readable_correspondence(corr)}')
       if should_save_images: util.write_image(imgN_ROI, f'img{frame_n}_{box_N}')
 
       list_index = -1
