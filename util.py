@@ -5,6 +5,10 @@ import cv2
 def read_image(file_name):
   return cv2.imread(file_name)
 
+def read_all_images(file_names):
+	images = [read_image(file_name) for file_name in file_names]
+	return list(zip(images, file_names))
+
 def write_image(image, file_output_name):
   return cv2.imwrite(f'{const.DATA_OUTPUT_DIRECTORY}/{file_output_name}.{const.IMAGE_FILE_EXTENSION}', image)
 
