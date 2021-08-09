@@ -78,12 +78,15 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
 
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
-def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False):
+def analyze_frames(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False, margins=None):
   GLOBAL_MAP = {}
   GLOBAL_LIST = []
   for frame_n in range(len(frames)-1):
     imgN  = util.read_image(frames[frame_n])
     imgN_1  = util.read_image(frames[frame_n+1])
+    if margins != None:
+      imgN = get_image_center(image=imgN, margins=margins)
+      imgN_1 = get_image_center(image=imgN_1, margins=margins)
 
     corrs, boxes_N, boxes_N_1 = compare_two_images(
       imgN,
@@ -163,12 +166,14 @@ def get_image_center(image, margins):
   return cropped_image
 
 if __name__ == "__main__":
+  MARGINS_TO_USE = (300, 275, 400, 175)
+
   analyze_frames(
     frames=const.MINION_3_FRAMES,
     num_sift_features=3000,
     sift_correspondence_ratio=0.6,
-    should_save_images=False
+    should_save_images=False,
+    margins=MARGINS_TO_USE
   )
 
-  MARGINS_TO_USE = (300, 275, 400, 175)
   bulk_carbon(frames=const.MINION_3_FRAMES, margins=MARGINS_TO_USE)
