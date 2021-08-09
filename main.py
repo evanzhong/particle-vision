@@ -117,7 +117,7 @@ def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, 
   print(GLOBAL_LIST)
   return GLOBAL_LIST
 
-def bulk_carbon(frames, margins=None):
+def bulk_carbon(frames, margins=None, should_save_images=False):
   frame_to_carbon_map = {}
   for frame in frames:
     frame_image = util.read_image(frame)
@@ -128,6 +128,12 @@ def bulk_carbon(frames, margins=None):
     boxes = seg.merge_overlapping_bounding_boxes(
       bounding_boxes=seg.find_bounding_boxes(contours=contours, padding=0)
     )
+
+    if should_save_images:
+      util.write_image(
+        image=seg.draw_bounding_boxes(image=frame_image, bounding_boxes=boxes, border_color=const.COLOR_GREEN),
+        file_output_name=f'{util.get_no_extension_filename(frame)}_boxes'
+      )
 
     total_pixel_area_for_frame = 0
     num_particles = len(boxes)
@@ -163,4 +169,8 @@ if __name__ == "__main__":
     margins=MARGINS_TO_USE
   )
 
-  bulk_carbon(frames=FRAMES_TO_ANALYZE, margins=MARGINS_TO_USE)
+  bulk_carbon(
+    frames=FRAMES_TO_ANALYZE,
+    margins=MARGINS_TO_USE,
+    should_save_images=False,
+  )
