@@ -3,7 +3,9 @@ import const
 import cv2
 
 def get_no_extension_filename(full_file_name):
-	return full_file_name.split('.')[0]
+	no_extension_filename = full_file_name.split('.')[0]
+	no_extension_filename = no_extension_filename.replace('/', '_')
+	return no_extension_filename
 
 def read_image(file_name):
   return cv2.imread(file_name)
