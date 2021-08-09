@@ -60,8 +60,8 @@ def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, 
     imgN  = util.read_image(frame_n_filename)
     imgN_1  = util.read_image(frame_n_1_filename)
     if margins != None:
-      imgN = get_image_center(image=imgN, margins=margins)
-      imgN_1 = get_image_center(image=imgN_1, margins=margins)
+      imgN = util.get_image_center(image=imgN, margins=margins)
+      imgN_1 = util.get_image_center(image=imgN_1, margins=margins)
 
     corrs, boxes_N, boxes_N_1 = compare_two_images(
       imgN,
@@ -122,7 +122,7 @@ def bulk_carbon(frames, margins=None, should_save_images=False):
   for frame in frames:
     frame_image = util.read_image(frame)
     if margins != None:
-      frame_image = get_image_center(image=frame_image, margins=margins)
+      frame_image = util.get_image_center(image=frame_image, margins=margins)
 
     contours = seg.find_contours(image=frame_image)
     boxes = seg.merge_overlapping_bounding_boxes(
@@ -147,14 +147,6 @@ def bulk_carbon(frames, margins=None, should_save_images=False):
 
   print(frame_to_carbon_map)
   return frame_to_carbon_map
-
-def get_image_center(image, margins):
-  image_shape = image.shape
-  margin_top, margin_right, margin_bot, margin_left = margins
-  max_y, max_x, channels = image_shape
-  center_box = (margin_left, margin_top, max_x-(margin_right*2), max_y-(margin_bot*2))
-  cropped_image = seg.crop_image(image=image, box=center_box)
-  return cropped_image
 
 if __name__ == "__main__":
   MARGINS_TO_USE = (300, 275, 400, 175)

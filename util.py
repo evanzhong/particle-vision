@@ -1,4 +1,5 @@
 import const
+from segmentation import crop_image
 
 import cv2
 
@@ -58,5 +59,13 @@ def get_box_containing_point(point, boxes):
 		if point_is_in_box:
 			return box
 	return None
+
+def get_image_center(image, margins):
+  image_shape = image.shape
+  margin_top, margin_right, margin_bot, margin_left = margins
+  max_y, max_x, channels = image_shape
+  center_box = (margin_left, margin_top, max_x-(margin_right*2), max_y-(margin_bot*2))
+  cropped_image = crop_image(image=image, box=center_box)
+  return cropped_image
 
 print('util.py module loaded')
