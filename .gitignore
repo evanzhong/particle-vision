@@ -138,6 +138,8 @@ out
 test_script.py
 
 # Runlogs
-m3_runlog
-m3_area_list
+m3fullframe_particle_tracking
+m3fullframe_particle_tracking_list
+m3margins_particle_tracking
+m3margins_particle_tracking_list
 m3_bulk_analysis
