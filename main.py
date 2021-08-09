@@ -152,10 +152,10 @@ def get_image_center(image, margins):
 
 if __name__ == "__main__":
   MARGINS_TO_USE = (300, 275, 400, 175)
-  FRAME_TO_ANALYZE = const.MINION_3_FRAMES
+  FRAMES_TO_ANALYZE = const.MINION_3_FRAMES
 
   track_particle_motion(
-    frames=FRAME_TO_ANALYZE,
+    frames=FRAMES_TO_ANALYZE,
     num_sift_features=3000,
     sift_correspondence_ratio=0.6,
     should_save_comparisons=False,
@@ -163,4 +163,4 @@ if __name__ == "__main__":
     margins=MARGINS_TO_USE
   )
 
-  bulk_carbon(frames=FRAME_TO_ANALYZE, margins=MARGINS_TO_USE)
+  bulk_carbon(frames=FRAMES_TO_ANALYZE, margins=MARGINS_TO_USE)
