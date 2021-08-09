@@ -24,7 +24,7 @@ def filter_correspondences_and_boxes(correspondences, boxes_0, boxes_1):
 
   return (filtered_correspondences, filtered_boxes_0, filtered_boxes_1)
 
-def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_ratio, should_save_images = False):
+def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_ratio):
   img0_keypoints, img0_descriptors = sift.run_sift(img_0, num_features=num_sift_features)
   img1_keypoints, img1_descriptors = sift.run_sift(img_1, num_features=num_sift_features)
 
@@ -49,41 +49,16 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
     boxes_1=img1_boxes
   )
 
-  if should_save_images:
-    img0_drawn_boxes = seg.draw_bounding_boxes(img_0, bounding_boxes=img0_boxes, border_color=const.COLOR_GREEN)
-    img1_drawn_boxes = seg.draw_bounding_boxes(img_1, bounding_boxes=img1_boxes, border_color=const.COLOR_GREEN)
-    sift.plot_correspondences(image1=img0_drawn_boxes,
-                              image2=img1_drawn_boxes,
-                              correspondences=img0_img1_correspondences,
-                              color=const.COLOR_RED,
-                              file_name='img0_img1_corr_and_boxes')
-    sift.plot_correspondences(image1=img0_drawn_boxes,
-                              image2=img1_drawn_boxes,
-                              correspondences=filtered_correspondences,
-                              color=const.COLOR_RED,
-                              file_name='img0_img1_corr_filtered_and_boxes')
-
-    img0_drawn_filtered_boxes = seg.draw_bounding_boxes(img_0, bounding_boxes=filtered_boxes_0, border_color=const.COLOR_GREEN)
-    img1_drawn_filtered_boxes = seg.draw_bounding_boxes(img_1, bounding_boxes=filtered_boxes_1, border_color=const.COLOR_GREEN)
-    sift.plot_correspondences(image1=img0_drawn_filtered_boxes,
-                              image2=img1_drawn_filtered_boxes,
-                              correspondences=img0_img1_correspondences,
-                              color=const.COLOR_RED,
-                              file_name='img0_img1_corr_and_boxes_filtered')
-    sift.plot_correspondences(image1=img0_drawn_filtered_boxes,
-                              image2=img1_drawn_filtered_boxes,
-                              correspondences=filtered_correspondences,
-                              color=const.COLOR_RED,
-                              file_name='img0_img1_corr_filtered_and_boxes_filtered')
-
   return filtered_correspondences, filtered_boxes_0, filtered_boxes_1
 
-def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, should_save_images=False, margins=None):
+def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, should_save_comparisons=False, should_save_ROIs=False, margins=None):
   GLOBAL_MAP = {}
   GLOBAL_LIST = []
   for frame_n in range(len(frames)-1):
-    imgN  = util.read_image(frames[frame_n])
-    imgN_1  = util.read_image(frames[frame_n+1])
+    frame_n_filename = frames[frame_n]
+    frame_n_1_filename = frames[frame_n+1]
+    imgN  = util.read_image(frame_n_filename)
+    imgN_1  = util.read_image(frame_n_1_filename)
     if margins != None:
       imgN = get_image_center(image=imgN, margins=margins)
       imgN_1 = get_image_center(image=imgN_1, margins=margins)
@@ -93,8 +68,18 @@ def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, 
       imgN_1,
       num_sift_features=num_sift_features,
       sift_correspondence_ratio=sift_correspondence_ratio,
-      should_save_images=should_save_images
     )
+
+    if should_save_comparisons:
+      imgN_with_boxes = seg.draw_bounding_boxes(imgN, bounding_boxes=boxes_N, border_color=const.COLOR_GREEN)
+      img_N_1_with_boxes = seg.draw_bounding_boxes(imgN_1, bounding_boxes=boxes_N_1, border_color=const.COLOR_GREEN)
+      sift.plot_correspondences(
+        image1=imgN_with_boxes,
+        image2=img_N_1_with_boxes,
+        correspondences=corrs,
+        color=const.COLOR_RED,
+        file_name=f'{util.get_no_extension_filename(frame_n_filename)}_to_{util.get_no_extension_filename(frame_n_1_filename)}'
+      )
 
     # Initialize the GLOBAL objects with frame_0 information
     if frame_n == 0:
@@ -116,7 +101,7 @@ def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, 
       imgN_ROI_area = seg.get_non_zero_pixel_area(imgN_ROI)
       imgN_1_ROI_area = seg.get_non_zero_pixel_area(imgN_1_ROI)
       print(f'({imgN_ROI_area},{imgN_1_ROI_area}) img{frame_n}_{box_N} to img{frame_n+1}_{box_N_1} via {util.get_readable_correspondence(corr)}')
-      if should_save_images: util.write_image(imgN_ROI, f'img{frame_n}_{box_N}')
+      if should_save_ROIs: util.write_image(imgN_ROI, f'img{frame_n}_{box_N}')
 
       list_index = -1
       if box_N in GLOBAL_MAP:
@@ -172,7 +157,8 @@ if __name__ == "__main__":
     frames=const.MINION_3_FRAMES,
     num_sift_features=3000,
     sift_correspondence_ratio=0.6,
-    should_save_images=False,
+    should_save_comparisons=False,
+    should_save_ROIs=False,
     margins=MARGINS_TO_USE
   )
 
