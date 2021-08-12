@@ -33,6 +33,14 @@ def compare_two_images(img_0, img_1, num_sift_features, sift_correspondence_rati
                                                              img1_keypoints,
                                                              img1_descriptors,
                                                              ratio=sift_correspondence_ratio)
+  _, inliers, outliers = sift.ransac(
+                          correspondences=img0_img1_correspondences,
+                          num_iterations=50,
+                          num_sampled_points=6,
+                          threshold=3
+                        )
+  img0_img1_correspondences = inliers
+
 
   img0_contours = seg.find_contours(img_0)
   img1_contours = seg.find_contours(img_1)
@@ -114,6 +122,7 @@ def track_particle_motion(frames, num_sift_features, sift_correspondence_ratio, 
       curr_map[box_N_1] = list_index
     GLOBAL_MAP = curr_map
 
+  GLOBAL_LIST = list(reversed(sorted(GLOBAL_LIST, key=len)))
   print(GLOBAL_LIST)
   return GLOBAL_LIST
 
@@ -150,7 +159,7 @@ def bulk_carbon(frames, margins=None, should_save_images=False):
 
 if __name__ == "__main__":
   MARGINS_TO_USE = (300, 275, 400, 175)
-  FRAMES_TO_ANALYZE = const.MINION_3_FRAMES
+  FRAMES_TO_ANALYZE = const.MINION_3_FRAMES[:-1]
 
   track_particle_motion(
     frames=FRAMES_TO_ANALYZE,

@@ -1,5 +1,6 @@
 import util
 
+import random
 import numpy as np
 import cv2
 
@@ -58,5 +59,76 @@ def find_sift_correspondences(kp1, des1, kp2, des2, ratio):
 			possible_correspondences.append((kp.pt, dist_to_candidates[lowest_dist].pt))
 
 	return possible_correspondences
+
+def compute_homography(correspondences):
+    A = np.empty((0,9))
+    for correspondence in correspondences:
+        pt_0 = correspondence[0]
+        pt_1 = correspondence[1]
+        x_0 = pt_0[0]
+        y_0 = pt_0[1]
+        x_1 = pt_1[0]
+        y_1 = pt_1[1]
+        block = np.asarray([
+            [-x_0, -y_0, -1, 0, 0, 0, x_0*x_1, y_0*x_1, x_1],
+            [0, 0, 0, -x_0, -y_0, -1, x_0*y_1, y_0*y_1, y_1]
+        ])
+        A = np.vstack((A, block))
+
+    u, s, vt = np.linalg.svd(A)
+    v = np.transpose(vt)
+    H = np.array(v[:, -1]) #last column
+    H = np.resize(H, (3,3))
+    return H
+
+def apply_homography(points, homography):
+    transformed_points = []
+    for point in points:
+        x = point[0]
+        y = point[1]
+        homo_coord = np.resize(np.asarray([x, y, 1]), (3,1))
+
+        new_coord = np.matmul(homography, homo_coord)
+        x_prime = new_coord[0]/new_coord[2]
+        y_prime = new_coord[1]/new_coord[2]
+        transformed_points.append((x_prime[0], y_prime[0]))
+
+    return transformed_points
+
+
+def compute_inliers(homography, correspondences, threshold):
+    outliers = []
+    inliers = []
+    for correspondence in correspondences:
+        p0 = correspondence[0]
+        p1 = correspondence[1]
+
+        p0prime = apply_homography([p0], homography)[0]
+        distance = np.sqrt((p1[0] - p0prime[0])**2 + (p1[1] - p0prime[1])**2)
+        if (distance < threshold):
+            inliers.append(correspondence)
+        else:
+            outliers.append(correspondence)
+
+    return inliers,outliers
+
+def ransac(correspondences, num_iterations, num_sampled_points, threshold):
+    H = None
+    best_inliers = []
+    best_outliers = []
+    max_inliers = 0
+
+    for i in range(0, num_iterations):
+        correspondence_subset = random.sample(correspondences, num_sampled_points)
+        H_candidate = compute_homography(correspondence_subset)
+
+        inliers, outliers = compute_inliers(H_candidate, correspondences, threshold)
+        if(len(inliers) > max_inliers):
+            max_inliers = len(inliers)
+            H = H_candidate
+            best_inliers = inliers
+            best_outliers = outliers
+
+    return H, best_inliers, best_outliers
 
 print('sift.py module loaded')
