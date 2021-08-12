@@ -64,7 +64,7 @@ def get_image_center(image, margins):
   image_shape = image.shape
   margin_top, margin_right, margin_bot, margin_left = margins
   max_y, max_x, channels = image_shape
-  center_box = (margin_left, margin_top, max_x-(margin_right*2), max_y-(margin_bot*2))
+  center_box = (margin_left, margin_top, max_x-(margin_right*2), max_y-(margin_bot*2))#TODO fix this bug, shouldn't be *2 should be -right-left
   cropped_image = crop_image(image=image, box=center_box)
   return cropped_image
 
